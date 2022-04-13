@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="springbootdubbo.mapper.MessageMapper">
+
+    <sql id="productQuerySql">
+        id,message_id,state,fix_count,data
+    </sql>
+
+    <select id="selectOne" parameterType="com.example.springbootdubbo.po.Message" resultType="com.example.springbootdubbo.po.Message">
+        select
+        <include refid="productQuerySql"/>
+        from message
+        <where>
+            <if test="messageId!=null">
+                and message_id=#{messageId}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertModel" parameterType="com.example.springbootdubbo.po.Message" useGeneratedKeys="true" keyProperty="id">
+        insert into message(message_id,state,fix_count,data) values(#{messageId},#{state},#{fixCount},#{data})
+    </insert>
+
+    <delete id="delModel" parameterType="com.example.springbootdubbo.po.Message">
+        delete from message
+        <where>
+            <if test="id!=null">
+                and id=#{id}
+            </if>
+            <if test="messageId!=null and messageId!=''">
+                and message_id=#{messageId}
+            </if>
+            <if test="state !=null and state!=''">
+                and state = #{state}
+            </if>
+        </where>
+    </delete>
+
+
+    <update id="updateModel" parameterType="com.example.springbootdubbo.po.Message">
+        update message
+        <set>
+            <if test="state!=null and state!=''">
+                state=#{state},
+            </if>
+            <if test="fixCount!=null">
+                fix_count=#{fixCount},
+            </if>
+        </set>
+        <where>
+            <if test="id!=null">
+                and id=#{id}
+            </if>
+            <if test="messageId!=null and messageId!=''">
+                and message_id=#{messageId}
+            </if>
+        </where>
+    </update>
+
+    <update id="updateBatch" parameterType="com.example.springbootdubbo.vo.MessageVo">
+        update message
+        set fix_count = fix_count+1
+        <where>
+            <if test="stateList!=null">
+                and state in
+                <foreach collection="stateList" separator="," open="(" close=")" item="state">
+                    #{state}
+                </foreach>
+            </if>
+            <if test="fixCount!=null">
+                <![CDATA[and fix_count<#{fixCount}]]>
+            </if>
+        </where>
+    </update>
+
+    <select id="queryList" parameterType="com.example.springbootdubbo.vo.MessageVo" resultType="com.example.springbootdubbo.po.Message">
+        select
+        <include refid="productQuerySql"/>
+        from message
+        <where>
+            <if test="stateList!=null">
+                and state in
+                <foreach collection="stateList" separator="," open="(" close=")" item="state">
+                    #{state}
+                </foreach>
+            </if>
+            <if test="fixCount!=null">
+                <![CDATA[and fix_count<#{fixCount}]]>
+            </if>
+        </where>
+    </select>
+
+
+    <select id="queryForSendAdministrator" parameterType="com.example.springbootdubbo.po.Message" resultType="com.example.springbootdubbo.po.Message">
+        select
+        <include refid="productQuerySql"/>
+        from message
+        <where>
+            <if test="state!=null">
+                and state=#{state}
+            </if>
+            <if test="fixCount!=null">
+                and fix_count=#{fixCount}
+            </if>
+        </where>
+    </select>
+
+
+
+
+</mapper>
